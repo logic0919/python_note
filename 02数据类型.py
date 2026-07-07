@@ -279,6 +279,7 @@ index()：
 # 8.集合
 # 集合（Set）是一个无序和无索引的集合。没有重复的成员。
 # 集合一旦创建，就无法更改项目，但是可以添加新项目，可以删除项目
+# 并 交 子
 '''
 可以用for循环、in、not in、len()
 不可以用索引
@@ -338,13 +339,168 @@ thisset = {"apple", "banana", "cherry"}
 del thisset
 print(thisset) # 这将引发一个错误，因为该集合已不存在
 
-交集判断：
+union()：合并集合（也就是并集）
+set3 = set1.union(set2)
+print(set3)
+
+isdisjoint()：交集判断：
 x = {"apple", "banana", "cherry"}
 y = {"google", "microsoft", "facebook"}
 z = x.isdisjoint(y)
 
-issubset()	返回另一个集合是否包含此集合。
-issuperset()	返回此集合是否包含另一个集合。
+issubset()：返回另一个集合是否包含此集合。
+z = x.issubset(y) # 判断y中是否包含x的全部，也就是x是否是y的子集
 
-合并
+issuperset()：返回此集合是否包含另一个集合。
+z = x.issuperset(y) # x是否包含y的全部，也就是y是否是x的子集
+
+difference()：补集
+z = x.difference(y) # 求仅存在于集合 x 中而不存在于集合 y 中的项目
+'''
+
+# 9.词典（字典）
+# 词典（Dictionary）是一个无序，可变和有索引的集合。没有重复的成员。
+'''
+dict()：构造函数：
+thisdict = dict(brand="Porsche", model="911", year=1963)
+
+thisdict =	{
+  "brand": "Porsche",
+  "model": "911",
+  "year": 1963
+}
+x = thisdict["model"]
+thisdict["year"] = 2019
+
+get()：
+x = thisdict.get("model")
+
+遍历：
+for x in thisdict:
+  print(x) # 获取到键
+  print(thisdict[x])
+for x in thisdict.values():
+  print(x) # 获取到值
+for x, y in thisdict.items():
+  print(x, y) # 获取到键和值
+
+检查是否有该键：
+if "model" in thisdict:
+  print("Yes, 'model' is one of the keys in the thisdict dictionary")
+ 
+len()：检查有几对键值对
+len(thisdict)
+
+添加项目：
+thisdict["color"] = "red"
+
+删除项目：
+pop()、popitem()、del、clear()
+thisdict.pop("model") # 指定键
+thisdict.popitem() # 删除最后插入的项目
+del thisdict["model"] # 指定键
+del thisdict # 也可以直接删除整个词典
+print(thisdict) # 会导致错误，因为 "thisdict" 不再存在
+thisdict.clear()
+print(thisdict) # {}
+
+copy()：复制词典
+不能通过键入 dict2 = dict1 来复制字典，因为：dict2 只是对 dict1 的引用，而 dict1 中的更改也将自动在 dict2 中进行。
+thisdict =	{
+  "brand": "Porsche",
+  "model": "911",
+  "year": 1963
+}
+mydict = thisdict.copy()
+mydict = dict(thisdict)
+
+嵌套：
+myfamily = {
+  "child1" : {
+    "name" : "Phoebe Adele",
+    "year" : 2002
+  },
+  "child2" : {
+    "name" : "Jennifer Katharine",
+    "year" : 1996
+  },
+  "child3" : {
+    "name" : "Rory John",
+    "year" : 1999
+  }
+}
+或者：
+child1 = {
+  "name" : "Phoebe Adele",
+  "year" : 2002
+}
+child2 = {
+  "name" : "Jennifer Katharine",
+  "year" : 1996
+}
+child3 = {
+  "name" : "Rory John",
+  "year" : 1999
+}
+myfamily = {
+  "child1" : child1,
+  "child2" : child2,
+  "child3" : child3
+}
+'''
+
+# 10.迭代器
+'''
+# 迭代元组
+mytuple = ("apple", "banana", "cherry")
+myit = iter(mytuple)
+print(next(myit))
+print(next(myit))
+print(next(myit))
+
+# 迭代字符串
+mystr = "banana"
+myit = iter(mystr)
+print(next(myit))
+print(next(myit))
+print(next(myit))
+print(next(myit))
+print(next(myit))
+print(next(myit))
+
+class MyNumbers:
+  def __iter__(self):
+    self.a = 1
+    return self
+  def __next__(self):
+    x = self.a
+    self.a += 1
+    return x
+myclass = MyNumbers()
+myiter = iter(myclass)
+print(next(myiter))
+print(next(myiter))
+print(next(myiter))
+print(next(myiter))
+print(next(myiter))
+
+# StopIteration
+如果你有足够的 next() 语句，或者在 for 循环中使用，则上面的例子将永远进行下去。
+为了防止迭代永远进行，我们可以使用 StopIteration 语句。
+在 __next__() 方法中，如果迭代完成指定的次数，我们可以添加一个终止条件来引发错误：
+class MyNumbers:
+  def __iter__(self):
+    self.a = 1
+    return self
+  def __next__(self):
+    if self.a <= 20:
+      x = self.a
+      self.a += 1
+      return x
+    else:
+      raise StopIteration
+myclass = MyNumbers()
+myiter = iter(myclass)
+for x in myiter:
+  print(x)
 '''
