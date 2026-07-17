@@ -1,4 +1,5 @@
-'''
+''''''
+''''
 文本类型：	str
 数值类型：	int, float, complex
 序列类型：	list, tuple, range
@@ -376,7 +377,11 @@ get()：
 x = thisdict.get("model")
 
 遍历：
+# thisdict.keys()、thisdict.values()、thisdict.items()这些都是一个列表
 for x in thisdict:
+  print(x) # 获取到键
+  print(thisdict[x])
+for x in thisdict.keys():
   print(x) # 获取到键
   print(thisdict[x])
 for x in thisdict.values():
