@@ -351,3 +351,21 @@ s3 = "hello world"
 s4 = "hello" + " world"
 print(s3 is s4) # True
 '''
+
+# 其他
+# a.view()：新建视图
+# is：是否同一内存地址
+# id(a)：获取变量本身的内存地址；
+#     视图和原数组id不同，但底层数据共用。
+#     ndarray = 外壳对象 + 底层数据缓冲区
+#     外壳：存 shape、dtype、步长、base、flags、数据指针，id(arr) 取的是这个外壳的地址；
+#     缓冲区：连续内存，存放真正数字，外壳靠指针指向它。
+#     view() 新建独立外壳，所以 id(原) != id(视图)；
+#     但新外壳的指针直接指向原数组同一块数据缓冲区，因此底层数据共用，改一个两边同步变。
+# a.base
+#     副本.copy ()：base = None，自身拥有数据
+#     视图 view / 切片：base = 原数组对象，代表数据来源于谁
+# a.copy()：开辟全新独立内存存储数据，新数组和原数组完全隔离，修改互不影响，base为 None。
+# a.flags.owndata
+#     True：数组自己持有数据（copy 生成、直接 array 创建）
+#     False：仅借用别人的数据（view、切片视图）
