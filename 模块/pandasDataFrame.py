@@ -58,18 +58,44 @@ print("="*60)
     df.loc[行, 列]、df.iloc[行, 列] 
     语法支持「行，列」双参数，既能只取行、只取列，也能同时指定行列拿到单个单元格 / 一块子表格；
     loc：当没有自定义时必须使用隐式数字标签，当自定义时必须使用自定义的
+        行维度：标签、标签切片、布尔数组、标签列表
+        列维度：列名字符串、列名列表
     iloc：无论是否自定义，都只认 0 开头的位置数字
+        行维度：纯数字、数字切片、数字下标列表
+        列维度：纯数字、数字切片、数字下标列表
+3. df.列名
+    df.分数 等价于 df["分数"]
+    条件限制（必须全部满足才能用点写法）：
+        列名不含空格、加减乘除、横杠、括号等特殊符号
+        列名不能和 pandas 内置属性重名（如 index、columns、size、loc、iloc、map 等）
+        列名不能以数字开头
+'''
 
 '''
+df['单列']	                        Series
+df.loc[单行索引]	                    Series
+df[['单列']]                         DataFrame
+df.loc[[单行索引]]                    DataFrame
+df[['列1','列2']]                    DataFrame
+示例代码：
+import pandas as pd
+df = pd.DataFrame({"姓名":["张三","李四"],"分数":[90,80]})
+print(type(df["分数"]))
+print(type(df[["分数"]]))
+print(type(df.loc[0]))
+print(type(df.loc[[0]]))
+print(type(df.loc[[0,1]]))
+'''
+
 print("3. 取值筛选")
 # 单列（Series）
-print("单列df['姓名']：\n", df["姓名"])
+print("单列df['姓名']：\n", df["姓名"]) # 标签取列
 # 多列（子df）
-print("多列df[['姓名','分数']]：\n", df[["姓名","分数"]])
+print("多列df[['姓名','分数']]：\n", df[["姓名","分数"]]) # 提取多个列用方括号嵌套 [[]]
 # 行切片
-print("切片前3行 df[:3]：\n", df[:3])
+print("切片前3行 df[:3]：\n", df[:3]) # 切片取行
 # 布尔条件筛选
-print("分数>90：\n", df[df["分数"] > 90])
+print("分数>90：\n", df[df["分数"] > 90]) # 分数>90的整行
 # loc 标签索引 行,列
 print("loc单行：\n", df.loc[1])
 print("loc指定行列：\n", df.loc[[0,2], ["姓名","年龄"]])
@@ -88,6 +114,7 @@ df2["年龄"] = df2["年龄"] + 1
 df2.loc[df2["分数"] < 80, "是否及格"] = False
 print("修改后df2：\n", df2)
 print("="*60)
+
 
 # ===================== 五、新增行列（增） =====================
 print("5. 新增行列")
@@ -125,13 +152,25 @@ print("="*60)
 
 # ===================== 八、排序、去重 =====================
 print("8. 排序、去重")
-# 按分数降序
+# 按分数这一列降序
 df_sort = df.sort_values(by="分数", ascending=False)
 print("按分数降序：\n", df_sort)
-# 按索引排序
+# 按索引排序——按行索引 index / 列名 columns排序
+# 按照行名排序
 df_idx_sort = df.sort_index()
+# 等价于以下一行
+df_sort.sort_index(axis=0)
+# 按照列名排序
+df_sort.sort_index(axis=1)
+
 # 去重
 df_dup = pd.concat([df, df.iloc[[0]]], ignore_index=True)
+# 不传参数（默认）：整行所有列的值全部一模一样，才算重复，只保留第一次出现的行，后面重复行删掉。
+# df.drop_duplicates(subset=["姓名","分数"])：只看你指定的几列，这几列相同就判定重复，其他列不管
+# keep="first"（默认）：保留第一次出现的重复行，删后面重复的
+# keep="last"：保留最后一条，删前面重复的
+# keep=False：所有重复行全部删除，一条不留
+# 这个函数天生只管行，重复列要单独处理，示例：df = df.T.drop_duplicates().T
 print("去重 drop_duplicates：\n", df_dup.drop_duplicates())
 print("="*60)
 
@@ -143,15 +182,69 @@ print("最大值 max：", df["分数"].max())
 print("最小值 min：", df["分数"].min())
 print("中位数 median：", df["分数"].median())
 print("标准差 std：", df["分数"].std())
-print("计数 count：", df["姓名"].count())
+print("计数 count：", df["姓名"].count()) # 统计该列一共有多少个非空数据
 print("唯一值 unique：", df["年龄"].unique())
-print("值计数 value_counts：\n", df["年龄"].value_counts())
+print("值计数 value_counts：\n", df["年龄"].value_counts()) # 看每个内容各自出现多少次，做频次统计
 print("="*60)
 
 # ===================== 十、表格转换常用 =====================
 print("10. 格式转换")
 print("转字典 to_dict：\n", df.to_dict("records"))
 print("转列表 to_list：\n", df["姓名"].tolist())
-print("转Series单列 df['分数'].squeeze()：\n", df["分数"].squeeze())
+print("转Series单列 df['分数'].squeeze()：\n", df["分数"].squeeze()) # 一行/一列都可以调用这个函数转为series
 # df.to_csv("data.csv", index=False) 保存csv
 # df.to_excel("data.xlsx", index=False) 保存excel
+
+# pandas绘图————plot()
+'''
+示例代码：
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. 构造测试数据
+df = pd.DataFrame({
+    "姓名": ["张三", "李四", "王五", "赵六", "钱七"],
+    "语文": [85, 92, 78, 90, 88],
+    "数学": [95, 80, 72, 88, 91]
+})
+
+# 设置中文显示（避免中文乱码）
+plt.rcParams["font.family"] = ["SimHei"]
+plt.rcParams["axes.unicode_minus"] = False
+
+# 2. 柱状图 kind="bar"
+# 以下函数用于创建一个宽 6 英寸、高 4 英寸的空白画布
+plt.figure(figsize=(8, 4))
+# 以下代码中：plt.gca()：拿到当前画布上正在使用的坐标轴对象
+# 指定 ax=plt.gca() = 强制让 pandas 在我们刚才创建的 figure 里绘图，而不是新开窗口。
+df.plot(x="姓名", y=["语文", "数学"], kind="bar", ax=plt.gca())
+plt.title("各科成绩柱状图")
+plt.show()
+
+# 3. 折线图 kind="line"
+plt.figure(figsize=(8, 4))
+df.plot(x="姓名", y="语文", kind="line", marker="o", ax=plt.gca())
+plt.title("语文成绩折线图")
+plt.show()
+
+# 4. 直方图 kind="hist"（看分数分布）
+plt.figure(figsize=(6, 4))
+# bins=5：把数据的数值范围平均分成 5 段区间，统计每个区间内有多少条数据。
+df["数学"].plot(kind="hist", bins=5, ax=plt.gca())
+plt.title("数学成绩分布直方图")
+plt.show()
+
+# 5. 饼图 kind="pie"
+plt.figure(figsize=(6, 6))
+# df.set_index("姓名")：把表格的行索引替换为「姓名」列，原本的 0/1/2 数字索引消失，每行用姓名做标识，返回新 DataFrame。
+df.set_index("姓名")["语文"].plot(kind="pie", autopct="%.1f%%", ax=plt.gca())
+plt.title("语文成绩占比饼图")
+plt.ylabel("")
+plt.show()
+
+# 6. 散点图 kind="scatter"
+plt.figure(figsize=(6, 4))
+df.plot(x="语文", y="数学", kind="scatter", s=80, ax=plt.gca())
+plt.title("语文vs数学成绩散点图")
+plt.show()
+'''

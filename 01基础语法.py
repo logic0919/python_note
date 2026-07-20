@@ -369,3 +369,47 @@ print(s3 is s4) # True
 # a.flags.owndata
 #     True：数组自己持有数据（copy 生成、直接 array 创建）
 #     False：仅借用别人的数据（view、切片视图）
+
+# map
+# pandas里面：仅作用于 Pandas Series（一维序列）
+'''
+df3["等级"] = df3["分数"].map(lambda x: "A" if x>=90 else "B")
+以上代码涉及知识点：
+    三元表达式：
+        "A" if x>=90 else "B"
+        相当于： 
+            if x >= 90:
+                return "A"
+            else:
+                return "B"
+    map函数：
+        Series.map(arg, na_action=None)
+        作用：遍历 Series 里每一个元素，一对一替换 / 转换，返回新 Series
+        参数：
+            arg：
+                三种传入参数方式：函数、字典、另一个 Series
+                    函数：把每个元素丢进函数，用函数返回值替换原值
+                    字典：字典用来做固定值匹配替换，key = 原始数据，value = 想要换成的内容。不在字典里的数值会变成 NaN
+                    另一个Series：索引关联匹配，类似简易查表
+            na_action：
+                可选参数，控制遇到 NaN 缺失值时怎么处理
+'''
+# python内置：语法：map(函数, 可迭代对象)，支持所有可迭代类型：list、tuple、set、字符串、dict（只遍历 key）、Series、生成器
+'''
+map(function, iterable, *iterables)：
+    参数：
+        function：处理元素的函数（普通函数 /lambda）
+        iterable：可迭代对象（list、tuple、set、字符串、Series、生成器等）
+        *iterables 不是某一个固定参数，是用来承接多出来的所有可迭代对象，数量不限：
+            只传 1 个容器：*iterables 无内容
+            传 2 个及以上：多出的全部收纳进 *iterables
+    返回值：map 迭代器，不能直接打印，要用 list () /tuple () 转成容器查看结果
+    示例代码：
+        scores = [92, 85, 76, 98]
+        # 处理函数
+        def get_level(x):
+            return "A" if x >= 90 else "B"
+        # 内置map
+        res = map(get_level, scores)
+        print(list(res)) # 输出：['A', 'B', 'B', 'A']
+'''
